@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+build
+tsconfig.tsbuildinfo
+
+# secrets — never commit API keys
+.env
+.env.*
+!.env.example
+keys.ts
+*.pem
+.DS_Store

@@ -26,9 +26,7 @@ All APIs offer a free trial or reduced initiation costs. Reach out to me if you 
         https://newsapi.org (in progress)
         Google Translate API (Free): "https://translate.googleapis.com/translate_a/single?client=gtx&sl="...
 
-3. You MUST place the keys+assistant ID in the root in a keys.ts file 
-
-5. Make sure Code Retrieval and Code Interpreter are set to ON
+3. Set `NEXT_PRIVATE_OPENAI_API_KEY` and `NEXT_PUBLIC_ELEVENLABS_API_KEY` in `.env.local`. Optionally set `NEXT_PUBLIC_OPENAI_MODEL` (defaults to `gpt-4o-mini`). This project uses the OpenAI Responses API, so an Assistants API ID is not required.
 
 ## START: (Node/NPM required)
 

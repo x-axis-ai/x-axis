@@ -1,7 +1,4 @@
 import React, { FC, useEffect, useRef, useState } from "react";
-import { Message } from "openai/resources/beta/threads/messages";
-import { Threads } from "openai/resources/beta/threads/threads";
-import OpenAI from "openai";
 import AudioPlayer from "../components/AudioPlayer";
 import { voice_ids } from "../private/voice_ids";
 import { PropagateLoader } from "react-spinners";
@@ -22,12 +19,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 
 import { personalities } from "../../public/instructions";
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
-
-const assistantId = process.env.NEXT_PUBLIC_ASSISTANT_ID;
 
 interface BightProps {
   updateColors: () => void;
@@ -38,14 +29,12 @@ interface FormData {
   placeholder: string;
   query: string;
   language: any;
-  messageList: Message[];
   waiting: boolean;
   code: any;
   message: string;
 
   voice: string;
   attitude: string;
-  thread: Threads.Thread | null;
   submitted: boolean;
   audioPlayerVisible: boolean;
   messageVisible: boolean;
@@ -57,12 +46,10 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
   const [formData, setFormData] = useState<FormData>({
     placeholder: "",
     query: "",
-    messageList: [],
     waiting: false,
     message: "",
     voice: "T0pkYhIZ7UMOc26gqqeX", // mrk voice from he category
     attitude: "Gen-Z",
-    thread: null,
     submitted: false,
     code: null,
     language: "🇺🇸",
@@ -70,61 +57,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
     messageVisible: true,
   });
 
-  const createThread = async () => {
-    try {
-      const thread = await openai.beta.threads.create();
-      return thread;
-    } catch (error) {
-      console.error("Error creating thread:", error);
-      throw error;
-    }
-  };
-
-  const listMessages = async (threadId: string) => {
-    try {
-      const messages = await openai.beta.threads.messages.list(threadId);
-      return messages;
-    } catch (error) {
-      console.error("Error listing messages:", error);
-      throw error;
-    }
-  };
-
-  const createMessage = async (threadId: string, content: string) => {
-    try {
-      await openai.beta.threads.messages.create(threadId, {
-        role: "user",
-        content: content,
-      });
-    } catch (error) {
-      console.error("Error creating message:", error);
-      throw error;
-    }
-  };
-
-  const createRun = async (threadId: string, instructions: string) => {
-    try {
-      if (!assistantId) throw new Error("Assistant ID is not configured");
-      const run = await openai.beta.threads.runs.create(threadId, {
-        assistant_id: assistantId,
-        instructions: instructions || undefined,
-      });
-      return run;
-    } catch (error) {
-      console.error("Error creating run:", error);
-      throw error;
-    }
-  };
-
-  const retrieveRun = async (threadId: string, runId: string) => {
-    try {
-      const run = await openai.beta.threads.runs.retrieve(threadId, runId);
-      return run;
-    } catch (error) {
-      console.error("Error retrieving run:", error);
-      throw error;
-    }
-  };
+  const previousResponseIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const translatePlaceholder = async () => {
@@ -143,33 +76,11 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
     translatePlaceholder();
   }, [formData.language]);
 
-  useEffect(() => {
-    const newThread = async () => {
-      try {
-        const thread = await createThread();
-        setFormData((prevData) => ({ ...prevData, thread: thread }));
-      } catch (error) {
-        console.error("Error creating new thread:", error);
-        alert("An error occurred while creating a new thread");
-      }
-    };
-
-    if (!formData.thread) newThread();
-  }, []);
-
-  const updateMessages = async () => {
+  const applyAssistantMessage = async (rawText: string) => {
     try {
-      if (!formData.thread?.id) throw new Error("No thread ID available");
-
-      const messages = await listMessages(formData.thread.id);
-      let messageContent = generateMessageListString(
-        messages.data.reverse(),
-        formData.query
-      );
-
-      messageContent = messageContent.includes("【")
-        ? messageContent.substring(0, messageContent.indexOf("【"))
-        : messageContent;
+      let messageContent = rawText.includes("【")
+        ? rawText.substring(0, rawText.indexOf("【"))
+        : rawText;
 
       const between = /```([\s\S]*)```/;
       let tech = between.exec(messageContent)?.[1];
@@ -180,7 +91,6 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
 
       setFormData((prevData) => ({
         ...prevData,
-        messageList: messages.data.reverse(),
         code: tech,
         message: messageContent,
         audioPlayerVisible: true,
@@ -188,14 +98,15 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
         waiting: false,
       }));
     } catch (error) {
+      setFormData((prevData) => ({ ...prevData, waiting: false }));
       alert("An error occurred. Please try again. Keys?");
       console.error("API error or no keys provided", error);
     }
   };
 
-  const handleQuery = async () => {
+  const handleQuery = async (query: string) => {
     try {
-      if (!formData.thread?.id) throw new Error("No thread ID available");
+      if (!query.trim()) return;
 
       setFormData((prevData) => ({
         ...prevData,
@@ -204,31 +115,33 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
         waiting: true,
       }));
 
-      await createMessage(formData.thread.id, formData.query);
-
       const instructions = getInstructionsByName(formData.attitude);
       if (!instructions) {
         throw new Error("Instructions not found for the given attitude");
       }
 
-      const run = await createRun(formData.thread.id, instructions);
-      if (!run.id) {
-        throw new Error("Failed to create run");
+      const result = await fetch("/api/respond", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query,
+          instructions,
+          previousResponseId: previousResponseIdRef.current,
+        }),
+      });
+
+      const data = await result.json();
+      if (!result.ok) {
+        throw new Error(data.error || "Response failed");
       }
 
-      const checkRunStatus = async () => {
-        const res = await retrieveRun(formData.thread!.id, run.id);
-        if (res.status === "completed") {
-          updateMessages();
-        } else if (res.status === "failed") {
-          throw new Error("Run failed");
-        } else {
-          setTimeout(checkRunStatus, 1000);
-        }
-      };
+      if (data.id) {
+        previousResponseIdRef.current = data.id;
+      }
 
-      checkRunStatus();
+      await applyAssistantMessage(data.output_text);
     } catch (error) {
+      setFormData((prevData) => ({ ...prevData, waiting: false }));
       alert(error);
       console.error("An error occurred:", error);
     }
@@ -240,7 +153,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleQuery();
+    handleQuery(formData.query);
     setFormData((prevData) => ({ ...prevData, submitted: true, query: "" }));
 
   // Dismiss the keyboard on mobile by blurring the input
@@ -267,28 +180,6 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
   //     return newSelection;
   //   });
   // };
-
-  function generateMessageListString(
-    messageList: Message[],
-    userQuery: string
-  ): string {
-    let jsxString: string = "";
-    for (let i = messageList.length - 1; i >= 0; i--) {
-      const message = messageList[i];
-      if (message.role === "user") continue;
-      for (let j = message.content.length - 1; j >= 0; j--) {
-        const contentBlock = message.content[j];
-        if (contentBlock.type === "text") {
-          const textValue = contentBlock.text.value;
-          if (textValue !== userQuery) {
-            jsxString = textValue;
-            return jsxString;
-          }
-        }
-      }
-    }
-    return jsxString;
-  }
 
   return (
     <div className="w-[100%] ">
