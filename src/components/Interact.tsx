@@ -116,7 +116,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
     waiting: false,
     message: "",
     voice: "pNInz6obpgDQGcFmaJgB", // Adam, a premade ElevenLabs voice
-    attitude: "Gen-Z",
+    attitude: "Funny",
     submitted: false,
     code: null,
     language: "en",
