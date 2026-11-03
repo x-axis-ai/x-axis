@@ -66,6 +66,49 @@ function BlurRevealText({ text }: { text: string }) {
   );
 }
 
+function leadingEmoji(label: string): string {
+  const match = label
+    .trim()
+    .match(
+      /^(?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:\uFE0F|\u200D\p{Extended_Pictographic}|\p{Regional_Indicator})*/u
+    );
+  return match?.[0] ?? label.trim().charAt(0);
+}
+
+function EmojiSelect({
+  emoji,
+  className = "",
+  style,
+  ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement> & { emoji: string }) {
+  const width = style?.width ?? "38px";
+  const height = style?.height ?? "32px";
+  const borderRadius = style?.borderRadius ?? "16px";
+
+  return (
+    <div
+      className="relative mr-2 shrink-0 hover:scale-90 transition-transform duration-500 ease-in-out"
+      style={{ width, height }}
+    >
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-[7] flex items-center justify-center text-xl leading-none text-white"
+      >
+        {emoji}
+      </span>
+      <select
+        {...props}
+        className={`custom-select relative z-[6] h-full w-full cursor-pointer appearance-none bg-black/50 bg-none text-transparent focus:outline-none focus:ring-0 ${className}`}
+        style={{
+          borderRadius,
+          WebkitAppearance: "none",
+          color: "transparent",
+        }}
+      />
+    </div>
+  );
+}
+
 const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
   const [formData, setFormData] = useState<FormData>({
     placeholder: "",
@@ -85,6 +128,15 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
   const [listening, setListening] = useState(false);
   const previousResponseIdRef = useRef<string | null>(null);
   const threadEndRef = useRef<HTMLDivElement | null>(null);
+
+  const languageEmoji = leadingEmoji(
+    languages[formData.language as keyof typeof languages] || "🇺🇸"
+  );
+  const voiceEmoji = leadingEmoji(
+    Object.values(voice_ids)
+      .flatMap((group) => Object.entries(group))
+      .find(([, id]) => id === formData.voice)?.[0] || "🎙️"
+  );
 
   const { levelRef, toggleListening, stopListening } = useVoiceEntry({
     language: formData.language,
@@ -315,8 +367,8 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
             }}
           >
             <div className="liquid-glass-bar relative z-[5] overflow-hidden transition-all duration-300 bounce items-center justify-center flex w-full p-1 rounded-[40px]">
-              <select
-                className="relative z-[6] text-white mr-2 pl-2 text-xl focus:outline-none cursor-pointer focus:ring-0 hover:scale-90 transition-transform duration-500 ease-in-out custom-select"
+              <EmojiSelect
+                emoji={languageEmoji}
                 value={formData.language}
                 title="Choose a language"
                 onChange={(e) =>
@@ -329,7 +381,6 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                   borderRadius: "20px 10px 10px 20px",
                   width: "38px",
                   height: "32px",
-                  WebkitAppearance: "none",
                 }}
               >
                 {Object.entries(languages).map(([name, flag]) => (
@@ -337,9 +388,9 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                     {flag}
                   </option>
                 ))}
-              </select>
-              <select
-                className="relative z-[6] text-white mr-2 pl-2 text-xl focus:outline-none cursor-pointer focus:ring-0 scale-x-[-1] hover:scale-x-[-0.9] hover:scale-y-90 transition-transform duration-500 ease-in-out custom-select"
+              </EmojiSelect>
+              <EmojiSelect
+                emoji={voiceEmoji}
                 value={formData.voice}
                 title="Choose a voice"
                 onChange={(e) =>
@@ -349,10 +400,9 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                   }))
                 }
                 style={{
-                  borderRadius: "20px 10px 10px 20px",
-                  width: "38px",
+                  borderRadius: "11px",
+                  width: "37px",
                   height: "32px",
-                  WebkitAppearance: "none",
                 }}
               >
                 <optgroup label="He/Him">
@@ -376,7 +426,30 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                     </option>
                   ))}
                 </optgroup>
-              </select>
+              </EmojiSelect>
+              <EmojiSelect
+                emoji="🎭"
+                value={formData.attitude}
+                title="Customize attitude"
+                onChange={(e) => {
+                  const selectedPersonality = getPersonalityByName(e.target.value);
+                  setFormData((prevData) => ({
+                    ...prevData,
+                    attitude: selectedPersonality ? selectedPersonality.name : "",
+                  }));
+                }}
+                style={{
+                  borderRadius: "10px 16px 16px 10px",
+                  width: "38px",
+                  height: "32px",
+                }}
+              >
+                {personalities.map((personality) => (
+                  <option key={personality.name} value={personality.name}>
+                    🎭 {personality.name}
+                  </option>
+                ))}
+              </EmojiSelect>
               <input
                 size={1}
                 style={{ flex: 1, minWidth: 0 }}
@@ -400,33 +473,6 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                   {listening ? "◼" : "🎙️"}
                 </span>
               </button>
-              <div
-                className="relative z-[6] flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white hover:scale-90 transition-transform duration-500 ease-in-out ml-1"
-                style={{ width: "32px", height: "32px" }}
-              >
-                <span className="pointer-events-none text-xl leading-none" aria-hidden>
-                  🎭
-                </span>
-                <select
-                  className="absolute inset-0 cursor-pointer opacity-0 focus:outline-none focus:ring-0"
-                  value={formData.attitude}
-                  title="Customize attitude"
-                  onChange={(e) => {
-                    const selectedPersonality = getPersonalityByName(e.target.value);
-                    setFormData((prevData) => ({
-                      ...prevData,
-                      attitude: selectedPersonality ? selectedPersonality.name : "",
-                    }));
-                  }}
-                  style={{ WebkitAppearance: "none" }}
-                >
-                  {personalities.map((personality) => (
-                    <option key={personality.name} value={personality.name}>
-                      {personality.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
           </ClientVoiceBeam>
 

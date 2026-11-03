@@ -41,7 +41,7 @@ const SPEECH_LANG: Record<string, string> = {
   ar: "ar-SA",
   cs: "cs-CZ",
   el: "el-GR",
-  hr: "fi-FI",
+  fi: "fi-FI",
   ms: "ms-MY",
   sk: "sk-SK",
   da: "da-DK",

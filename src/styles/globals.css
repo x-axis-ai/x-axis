@@ -188,10 +188,15 @@ select::after {
 }
 
 select {
-  
-  background-image: url('/random.svg');
-  background-position: right 0px center;
-  background-repeat: no-repeat;
+  background-image: none;
+}
+
+/* Closed select stays dimmed; open menu options render full opacity. */
+.custom-select option,
+.custom-select optgroup {
+  color: #111111;
+  background-color: #ffffff;
+  opacity: 1;
 }
 
 

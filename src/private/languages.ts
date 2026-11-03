@@ -19,7 +19,7 @@ export const languages = {
   ar: '\u{1F1E6}\u{1F1F8} Arabic', // 🇸🇦 Arabic
   cs: '\u{1F1E8}\u{1F1F7} Czech', // 🇨🇿 Czech
   el: '\u{1F1EC}\u{1F1F7} Greek', // 🇬🇷 Greek
-  hr: '\u{1F1F7}\u{1F1F0} Finnish', // 🇫🇮 Finnish
+  fi: '\u{1F1EB}\u{1F1EE} Finnish', // 🇫🇮 Finnish
   ms: '\u{1F1F2}\u{1F1FE} Malay', // 🇲🇾 Malay
   sk: '\u{1F1F8}\u{1F1F0} Slovak', // 🇸🇰 Slovak
   da: '\u{1F1E9}\u{1F1F0} Danish', // 🇩🇰 Danish
