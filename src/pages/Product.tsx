@@ -127,7 +127,7 @@ export default function Product() {
   );
 
   return (
-    <main className="relative min-h-[100dvh] overflow-hidden">
+    <main className="relative h-[100dvh] overflow-hidden">
       <VantaComponent
         highColor={highColor}
         midColor={midColor}
@@ -136,7 +136,7 @@ export default function Product() {
         speed={speed}
         blur={blur}
       />
-      <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+      <div className="relative z-10 flex h-full w-full flex-col items-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
         <Interact updateColors={updateColors} useDefaults={useDefaults} />
       </div>
     </main>
