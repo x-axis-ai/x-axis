@@ -49,7 +49,7 @@ function BlurRevealText({ text }: { text: string }) {
           return <React.Fragment key={`s-${index}`}>{part}</React.Fragment>;
         }
 
-        const delay = wordIndex * 0.2;
+        const delay = 0.4 + wordIndex * 0.26;
         wordIndex += 1;
 
         return (
