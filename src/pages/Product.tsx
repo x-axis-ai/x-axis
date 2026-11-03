@@ -136,7 +136,7 @@ export default function Product() {
         speed={speed}
         blur={blur}
       />
-      <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+      <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
         <Interact updateColors={updateColors} useDefaults={useDefaults} />
       </div>
     </main>

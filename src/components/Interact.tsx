@@ -309,7 +309,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
   // };
 
   return (
-    <div className="flex min-h-full w-full max-w-3xl flex-col items-center px-[4%] pb-5 pt-16">
+    <div className="flex h-full min-h-0 w-full max-w-3xl flex-1 flex-col items-center px-[4%] pb-5 pt-16">
       <div className="mb-4 min-h-0 w-full flex-1 overflow-y-auto overscroll-contain px-1">
         <div className="flex min-h-full flex-col justify-end gap-4 py-2">
           {thread.map((entry) => (
