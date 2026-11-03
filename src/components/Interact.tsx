@@ -293,7 +293,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
         </div>
       </div>
 
-      <div className="liquid-glass relative z-10 w-full shrink-0 px-4 py-5">
+      <div className="liquid-glass relative z-10 w-full shrink-0 px-4 py-[18px]">
         <form
           onSubmit={handleSubmit}
           className="flex items-center justify-center"
@@ -314,7 +314,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
               return 0;
             }}
           >
-            <div className="liquid-glass-bar overflow-hidden transition-all duration-300 bounce items-center justify-center z-10 flex w-full p-1.5 rounded-[40px]">
+            <div className="liquid-glass-bar overflow-hidden transition-all duration-300 bounce items-center justify-center z-10 flex w-full p-1 rounded-[40px]">
               <select
                 className="   text-white mr-2 pl-2 text-xl focus:outline-none cursor-pointer focus:ring-0 hover:scale-90 transition-transform duration-500 ease-in-out custom-select"
                 value={formData.language}
@@ -378,12 +378,13 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                 </optgroup>
               </select>
               <input
-                style={{ flex: 1 }}
+                size={1}
+                style={{ flex: 1, minWidth: 0 }}
                 onChange={handleQueryChange}
                 value={formData.query}
                 id="query"
                 placeholder={listening ? "Listening..." : formData.placeholder}
-                className="caret-white text-white pl-2 focus:outline-none focus:ring-0 bg-transparent"
+                className="min-w-0 caret-white text-white pl-2 focus:outline-none focus:ring-0 bg-transparent"
                 autoFocus
               />
               <button
@@ -439,7 +440,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
               WebkitAppearance: "none",
             }}
           >
-            ✦
+            ↑
           </button>
         </form>
       </div>
