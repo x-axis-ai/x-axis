@@ -101,7 +101,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
       const updatedPlaceholder = await Translate(
         "en",
         formData.language,
-        "Go off... "
+        "Type here..."
       );
 
       setFormData((prevFormData) => ({
@@ -314,9 +314,9 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
               return 0;
             }}
           >
-            <div className="liquid-glass-bar overflow-hidden transition-all duration-300 bounce items-center justify-center z-10 flex w-full p-1 rounded-[40px]">
+            <div className="liquid-glass-bar relative z-[5] overflow-hidden transition-all duration-300 bounce items-center justify-center flex w-full p-1 rounded-[40px]">
               <select
-                className="   text-white mr-2 pl-2 text-xl focus:outline-none cursor-pointer focus:ring-0 hover:scale-90 transition-transform duration-500 ease-in-out custom-select"
+                className="relative z-[6] text-white mr-2 pl-2 text-xl focus:outline-none cursor-pointer focus:ring-0 hover:scale-90 transition-transform duration-500 ease-in-out custom-select"
                 value={formData.language}
                 title="Choose a language"
                 onChange={(e) =>
@@ -339,7 +339,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                 ))}
               </select>
               <select
-                className="   text-white mr-2 pl-2 text-xl focus:outline-none cursor-pointer focus:ring-0 scale-x-[-1] hover:scale-x-[-0.9] hover:scale-y-90 transition-transform duration-500 ease-in-out custom-select"
+                className="relative z-[6] text-white mr-2 pl-2 text-xl focus:outline-none cursor-pointer focus:ring-0 scale-x-[-1] hover:scale-x-[-0.9] hover:scale-y-90 transition-transform duration-500 ease-in-out custom-select"
                 value={formData.voice}
                 title="Choose a voice"
                 onChange={(e) =>
@@ -384,14 +384,14 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                 value={formData.query}
                 id="query"
                 placeholder={listening ? "Listening..." : formData.placeholder}
-                className="min-w-0 caret-white text-white pl-2 focus:outline-none focus:ring-0 bg-transparent"
+                className="relative z-[6] min-w-0 caret-white text-white pl-2 placeholder:text-white/40 focus:outline-none focus:ring-0 bg-transparent"
                 autoFocus
               />
               <button
                 type="button"
                 onClick={toggleListening}
                 title={listening ? "Stop listening" : "Speak"}
-                className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full hover:scale-90 transition-transform duration-500 ease-in-out ${
+                className={`relative z-[6] flex shrink-0 items-center justify-center overflow-hidden rounded-full hover:scale-90 transition-transform duration-500 ease-in-out ${
                   listening ? "bg-red-400" : "bg-white"
                 }`}
                 style={{ width: "32px", height: "32px" }}
@@ -401,7 +401,7 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
                 </span>
               </button>
               <div
-                className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white hover:scale-90 transition-transform duration-500 ease-in-out ml-1"
+                className="relative z-[6] flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white hover:scale-90 transition-transform duration-500 ease-in-out ml-1"
                 style={{ width: "32px", height: "32px" }}
               >
                 <span className="pointer-events-none text-xl leading-none" aria-hidden>
