@@ -1,38 +1,34 @@
-import axios from "axios";
-import { ElevenLabsClient } from "elevenlabs";
-
-
 const Speak = async (inputText: string, voiceChoice: string) => {
-  const API_KEY = process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY; // Make sure to use a public key in the frontend
-  const client = new ElevenLabsClient({ apiKey: API_KEY });
- 
   try {
-    const response = await axios.post(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceChoice}`,
-      {
+    const response = await fetch("/api/speak", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         text: inputText,
-        use_speaker_boost: true,
+        voiceId: voiceChoice,
+      }),
+    });
 
-        model_id: "eleven_turbo_v2_5",
-      },
-      {
-        headers: {
-          accept: "audio/mpeg",
-          "Content-Type": "application/json",
-          "xi-api-key": API_KEY,
-        },
-        responseType: "arraybuffer",
+    if (!response.ok) {
+      let message = "Error processing text-to-speech";
+      try {
+        const data = await response.json();
+        if (typeof data.error === "string" && data.error.trim()) {
+          message = data.error;
+        }
+      } catch {
+        // Response may be empty or non-JSON
       }
-    );
+      throw new Error(message);
+    }
 
-    // Convert the arraybuffer to a blob and create an audio URL
-    const audioBlob = new Blob([response.data], { type: "audio/mpeg" });
-    const audioUrl = URL.createObjectURL(audioBlob);
-
-    return audioUrl; // Return the generated audio URL
+    const audioBlob = await response.blob();
+    return URL.createObjectURL(audioBlob);
   } catch (error) {
     console.error("Error calling ElevenLabs API:", error);
-    throw new Error("Error processing text-to-speech"+ error);
+    throw error instanceof Error
+      ? error
+      : new Error("Error processing text-to-speech");
   }
 };
 

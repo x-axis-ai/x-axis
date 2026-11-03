@@ -46,9 +46,16 @@ export default async function handler(
       return res.status(502).json({ error: "Response failed" });
     }
 
+    const outputText =
+      typeof response.output_text === "string" ? response.output_text : "";
+
+    if (!outputText.trim()) {
+      return res.status(502).json({ error: "Empty response from model" });
+    }
+
     return res.status(200).json({
       id: response.id,
-      output_text: response.output_text,
+      output_text: outputText,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

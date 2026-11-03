@@ -55,7 +55,7 @@ class VantaComponent extends Component<Props> {
         baseColor: this.props.base,
         blurFactor: this.props.blur,
         speed: this.props.speed,
-        zoom: 0.2,
+        zoom: 0.3,
       });
     }
   }

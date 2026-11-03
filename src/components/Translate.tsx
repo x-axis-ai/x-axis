@@ -1,17 +1,26 @@
-import axios from 'axios';
+const Translate = async (
+  lang: string,
+  targetLang: string,
+  text: string
+): Promise<string> => {
+  if (!text) return "";
+  if (lang === targetLang) return text;
 
-const Translate = async (lang: string, targetLang: string, text: string): Promise<string> => {
   try {
-    
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${lang}&tl=${targetLang}&dt=t&q=${encodeURI(text)}`;
-    const response = await axios.get(url);
-   
-    const data = response.data;
-    return data[0][0][0];
+    const response = await fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lang, targetLang, text }),
+    });
+
+    const data = (await response.json()) as { text?: string };
+    if (typeof data.text === "string" && data.text.length > 0) {
+      return data.text;
+    }
+    return text;
   } catch (error) {
-    alert('An error occurred. Please try again.');
-    console.error('Translation Error:', error);
-    return '';
+    console.error("Translation Error:", error);
+    return text;
   }
 };
 

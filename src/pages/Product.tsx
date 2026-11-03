@@ -1,12 +1,26 @@
 // src/pages/Product.tsx
 import React, { useState, useMemo, useRef } from "react";
 import VantaComponent from "@/components/VantaComponent";
-import Bight from "@/components/Bight"; // Assuming this was a typo
 import Interact from "@/components/Interact";
-import Spline from "@splinetool/react-spline";
 
-// Utility function to generate random color
-const randomColor = () => Math.floor(Math.random() * 0xffffff);
+const hslToHex = (h: number, s: number, l: number) => {
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color);
+  };
+  return (f(0) << 16) | (f(8) << 8) | f(4);
+};
+
+const randomColor = () =>
+  hslToHex(
+    Math.random() * 360,
+    0.55 + Math.random() * 0.45,
+    0.3 + Math.random() * 0.45
+  );
+
+const randomDuration = () => 35 + Math.random() * 100;
 
 // Utility function to interpolate between two colors
 const interpolateColor = (
@@ -33,7 +47,7 @@ const interpolateColor = (
 };
 
 export default function Product() {
-  const [highColor, setHigh] = useState(0x0);
+  const [highColor, setHigh] = useState(0xFFFFFF);
   const [midColor, setMid] = useState(0x0);
   const [lowColor, setLow] = useState(0x0);
   const [base, setBase] = useState(0x0);
@@ -41,108 +55,70 @@ export default function Product() {
   const [speed, setSpeed] = useState(0.1);
 
   const stopLoopRef = useRef(false);
+  const loopStartedRef = useRef(false);
+  const animateColorsRef = useRef(false);
+  const speedTargetRef = useRef(0.1);
+  const blurTargetRef = useRef(1);
 
-  // Function to smoothly update colors, speed, and blur
   const updateColors = () => {
-    stopLoopRef.current = false; // Ensure the loop runs when called
-    
-    let startHighColor = highColor;
-    let startMidColor = midColor;
-    let startLowColor = lowColor;
+    stopLoopRef.current = false;
+    animateColorsRef.current = true;
+    speedTargetRef.current = 6;
+    blurTargetRef.current = 0.5;
 
-    let targetHighColor = randomColor()*4; // Use the randomColor function
-    let targetMidColor = randomColor()*3; // Use the randomColor function
-    let targetLowColor = randomColor()*2; // Use the randomColor function
-  
+    if (loopStartedRef.current) return;
+    loopStartedRef.current = true;
 
-    let startSpeed = 0.1;
-    let targetSpeed = 6;
+    const makeLane = (start: number) => ({
+      start,
+      target: randomColor(),
+      progress: 0,
+      duration: randomDuration(),
+    });
 
-    let startBlur = 1;
-    let targetBlur = 0.5;
+    const high = makeLane(highColor);
+    const mid = makeLane(midColor);
+    const low = makeLane(lowColor);
 
-    let progress = 0;
-    const duration = 100; // Adjust duration for smoothness
+    const stepLane = (
+      lane: { start: number; target: number; progress: number; duration: number },
+      setColor: (color: number) => void
+    ) => {
+      lane.progress += 1 / lane.duration;
+      if (lane.progress >= 1) {
+        lane.start = lane.target;
+        lane.target = randomColor();
+        lane.progress = 0;
+        lane.duration = randomDuration();
+      }
+      setColor(interpolateColor(lane.start, lane.target, lane.progress));
+    };
 
     const colorLoop = () => {
-      if (stopLoopRef.current) return; // Stop loop if requested
-
-      progress += 1 / duration;
-
-      if (progress >= 1) {
-        // Once transition completes, reset progress and pick new target colors
-        progress = 0;
-        startHighColor = targetHighColor;
-        targetHighColor = randomColor()*2; // Use the randomColor function
-
-        startMidColor = targetMidColor;
-        targetMidColor = randomColor()*3; // Use the randomColor function
-
-        startLowColor = targetLowColor;
-        targetLowColor = randomColor(); // Use the randomColor function
-
-        startSpeed = targetSpeed;
-        targetSpeed = 6; // Reset target speed to 10 for continuous increase
-
-        startBlur = targetBlur;
-        targetBlur = 0.5; // Reset target blur for continuous decrease
+      if (stopLoopRef.current) {
+        loopStartedRef.current = false;
+        return;
       }
 
-      // Interpolate colors based on progress
-      setHigh(interpolateColor(startHighColor, targetHighColor, progress));
-      setMid(interpolateColor(startMidColor, targetMidColor, progress));
-      setLow(interpolateColor(startLowColor, targetLowColor, progress));
+      if (animateColorsRef.current) {
+        stepLane(high, setHigh);
+        stepLane(mid, setMid);
+        stepLane(low, setLow);
+      }
 
-      // Interpolate speed and blur based on progress
-      setSpeed(startSpeed + (targetSpeed - startSpeed) * progress);
-      setBlur(startBlur + (targetBlur - startBlur) * progress);
+      setSpeed((current) => current + (speedTargetRef.current - current) * 0.02);
+      setBlur((current) => current + (blurTargetRef.current - current) * 0.02);
 
-      requestAnimationFrame(colorLoop); // Continue updating
+      requestAnimationFrame(colorLoop);
     };
 
-    colorLoop(); // Start the loop
+    colorLoop();
   };
 
-  // Function to reset colors, speed, and blur smoothly
   const useDefaults = () => {
-    stopLoopRef.current = true; // Stop the color loop
-
-    let startHighColor = highColor;
-    let startMidColor = midColor;
-    let startLowColor = lowColor;
-    let startBaseColor = base;
-    let targetHighColor = 0x0;
-    let targetMidColor = 0x0;
-    let targetLowColor = 0x0;
-    let targetBaseColor = 0x0; // Reset target base color
-
-    let startBlur = blur;
-    let targetBlur = 1;
-    let startSpeed = speed;
-    let targetSpeed = 0.1;
-
-    let progress = 0;
-    const duration = 280; // Adjust duration for smoothness
-
-    const resetLoop = () => {
-      if (progress >= 1) return; // Stop loop when transition completes
-
-      progress += 1 / duration;
-
-      // Interpolate colors based on progress
-      setHigh(interpolateColor(startHighColor, targetHighColor, progress));
-      setMid(interpolateColor(startMidColor, targetMidColor, progress));
-      setLow(interpolateColor(startLowColor, targetLowColor, progress));
-      setBase(interpolateColor(startBaseColor, targetBaseColor, progress)); // Interpolate base color
-
-      // Interpolate blur and speed based on progress
-      setBlur(startBlur + (targetBlur - startBlur) * progress);
-      setSpeed(startSpeed + (targetSpeed - startSpeed) * progress);
-
-      requestAnimationFrame(resetLoop); // Continue updating
-    };
-
-    resetLoop(); // Start the loop
+    animateColorsRef.current = false;
+    speedTargetRef.current = 0.7;
+    blurTargetRef.current = 0.8;
   };
 
   const key = useMemo(
@@ -151,17 +127,10 @@ export default function Product() {
   );
 
   return (
-    <main className=" relative">
-      <div className=" relative z-10 flex h-screen  items-center justify-center">
-        <div className=" pt-36 flex-col space-y-28  relative z-10 flex  h-[100%]  w-[100%] flex-col items-center justify-center rounded-[30px] bg-gradient-to-b from-white/0 to-black/00  ">
-          <Bight /> 
-          {/* Add margin for spacing */}
+    <main className="relative">
+      <div className="relative z-10 flex h-screen items-stretch justify-center">
+        <div className="relative z-10 flex h-full w-full flex-col items-center rounded-[30px] bg-gradient-to-b from-white/0 to-black/00">
           <Interact updateColors={updateColors} useDefaults={useDefaults} />
-        </div>
-        <div className="">
-          {/* <Spline
-        scene="https://prod.spline.design/UsT7F4lC7Ac6xJS2/scene.splinecode" 
-      /> */}
         </div>
         <VantaComponent
           highColor={highColor}

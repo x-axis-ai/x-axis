@@ -25,7 +25,11 @@ const AudioPlayer: React.FC<AudioProps> = ({
           setAudioURL(audioUrl); // Set the URL directly
         }
       } catch (error) {
-        alert(error);
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Error processing text-to-speech";
+        alert(message);
         console.error("Error:", error);
       }
     };
