@@ -54,16 +54,18 @@ export default function Home() {
               title="Bight"
             >
               <Image
-                src={bight}
+                src="/xb.svg"
                 alt="Logo"
-                className=" opacity-100  w-[50px] md:w-[175px] "
+                width={75}
+                height={78}
+                className="opacity-100 h-auto w-[50px] md:w-[50px]"
               />
             </a>
             <p
               className="text-lg z-10 md:text-2xl font-light mb-6  text-blu"
               style={{}}
             >
-              is the ultimate <strong> digital human</strong>{" "}
+              x-axis is the ultimate <strong> digital human</strong>{" "}
                that bridges the gap between your emotions and AI.
             </p>
           </div>
@@ -102,13 +104,13 @@ export default function Home() {
         className="text-black fixed left-1/2 transform -translate-x-2/4 text-center font-semibold text-xs md:text-2xl"
         style={{ bottom: "20px" }}
       >
-        No{" "}
+        it's{" "}
         <ReactTyped
           strings={[
-            "cap",
-            "bad vibes",
-            "drama",
-            "fake energy",
+            "unique",
+            "fun to use",
+            "multi-linqual",
+            "realistic",
           ]}
           typeSpeed={50}
           backSpeed={25}

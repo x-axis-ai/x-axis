@@ -11,3 +11,6 @@ tsconfig.tsbuildinfo
 keys.ts
 *.pem
 .DS_Store
+
+# form signups (local)
+emails.txt
