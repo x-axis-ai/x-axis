@@ -128,6 +128,7 @@ export default function Product() {
 
   return (
     <main className="relative h-[100dvh] overflow-hidden">
+       
       <VantaComponent
         highColor={highColor}
         midColor={midColor}
@@ -137,6 +138,13 @@ export default function Product() {
         blur={blur}
       />
       <div className="relative z-10 flex h-full w-full flex-col items-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <div className="flex w-full shrink-0 items-center justify-center pt-4 pb-2">
+          <img
+            src="/xb.svg"
+            alt="Bight"
+            className="h-16 w-16 object-contain drop-shadow-sm invert"
+          />
+        </div>
         <Interact updateColors={updateColors} useDefaults={useDefaults} />
       </div>
     </main>
