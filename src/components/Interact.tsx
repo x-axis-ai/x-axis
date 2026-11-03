@@ -9,6 +9,7 @@ import { getPersonalityByName } from "../../public/instructions";
 import { personalities } from "../../public/instructions";
 import { useVoiceEntry } from "../components/VoiceEntry";
 import ClientVoiceBeam from "../components/ClientVoiceBeam";
+import { readApiJson } from "../lib/readApiJson";
 
 interface BightProps {
   updateColors: () => void;
@@ -188,7 +189,11 @@ const Interact: FC<BightProps> = ({ updateColors, useDefaults }) => {
         }),
       });
 
-      const data = await result.json();
+      const data = await readApiJson<{
+        error?: string;
+        id?: string;
+        output_text?: string;
+      }>(result);
       if (!result.ok) {
         throw new Error(
           typeof data.error === "string" ? data.error : "Response failed"

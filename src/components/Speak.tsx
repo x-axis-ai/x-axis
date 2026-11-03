@@ -1,3 +1,5 @@
+import { readApiJson } from "../lib/readApiJson";
+
 const Speak = async (inputText: string, voiceChoice: string) => {
   try {
     const response = await fetch("/api/speak", {
@@ -10,19 +12,18 @@ const Speak = async (inputText: string, voiceChoice: string) => {
     });
 
     if (!response.ok) {
-      let message = "Error processing text-to-speech";
-      try {
-        const data = await response.json();
-        if (typeof data.error === "string" && data.error.trim()) {
-          message = data.error;
-        }
-      } catch {
-        // Response may be empty or non-JSON
-      }
-      throw new Error(message);
+      const data = await readApiJson<{ error?: string }>(response);
+      throw new Error(
+        typeof data.error === "string" && data.error.trim()
+          ? data.error
+          : "Error processing text-to-speech"
+      );
     }
 
     const audioBlob = await response.blob();
+    if (!audioBlob.size) {
+      throw new Error("Empty audio response");
+    }
     return URL.createObjectURL(audioBlob);
   } catch (error) {
     console.error("Error calling ElevenLabs API:", error);

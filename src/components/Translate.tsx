@@ -1,3 +1,5 @@
+import { readApiJson } from "../lib/readApiJson";
+
 const Translate = async (
   lang: string,
   targetLang: string,
@@ -13,7 +15,7 @@ const Translate = async (
       body: JSON.stringify({ lang, targetLang, text }),
     });
 
-    const data = (await response.json()) as { text?: string };
+    const data = await readApiJson<{ text?: string }>(response);
     if (typeof data.text === "string" && data.text.length > 0) {
       return data.text;
     }
