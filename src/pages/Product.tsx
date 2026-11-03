@@ -140,9 +140,9 @@ export default function Product() {
       <div className="relative z-10 flex h-full w-full flex-col items-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
         <div className="flex w-full shrink-0 items-center justify-center pt-4 pb-2">
           <img
-            src="/xb.svg"
+            src="/xb.png"
             alt="Bight"
-            className="h-16 w-16 object-contain drop-shadow-sm invert"
+            className="h-16 w-16 object-contain drop-shadow-sm "
           />
         </div>
         <Interact updateColors={updateColors} useDefaults={useDefaults} />
