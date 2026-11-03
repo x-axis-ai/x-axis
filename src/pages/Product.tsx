@@ -127,9 +127,9 @@ export default function Product() {
   );
 
   return (
-    <main className="relative">
-      <div className="relative z-10 flex h-screen items-stretch justify-center">
-        <div className="relative z-10 flex h-full w-full flex-col items-center rounded-[30px] bg-gradient-to-b from-white/0 to-black/00">
+    <main className="relative min-h-[100dvh] bg-black">
+      <div className="relative z-10 flex min-h-[100dvh] items-stretch justify-center">
+        <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center bg-gradient-to-b from-white/0 to-black/00 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
           <Interact updateColors={updateColors} useDefaults={useDefaults} />
         </div>
         <VantaComponent
