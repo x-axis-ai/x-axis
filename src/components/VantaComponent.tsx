@@ -86,7 +86,12 @@ class VantaComponent extends Component<Props> {
   }
 
   render() {
-    return <div ref={this.sceneRef} className="w-full h-screen absolute z-0" />;
+    return (
+      <div
+        ref={this.sceneRef}
+        className="pointer-events-none fixed inset-0 z-0 h-[100dvh] w-full"
+      />
+    );
   }
 }
 

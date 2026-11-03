@@ -127,19 +127,17 @@ export default function Product() {
   );
 
   return (
-    <main className="relative min-h-[100dvh] bg-black">
-      <div className="relative z-10 flex min-h-[100dvh] items-stretch justify-center">
-        <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center bg-gradient-to-b from-white/0 to-black/00 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-          <Interact updateColors={updateColors} useDefaults={useDefaults} />
-        </div>
-        <VantaComponent
-          highColor={highColor}
-          midColor={midColor}
-          lowColor={lowColor}
-          base={base}
-          speed={speed}
-          blur={blur}
-        />
+    <main className="relative min-h-[100dvh] overflow-hidden">
+      <VantaComponent
+        highColor={highColor}
+        midColor={midColor}
+        lowColor={lowColor}
+        base={base}
+        speed={speed}
+        blur={blur}
+      />
+      <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
+        <Interact updateColors={updateColors} useDefaults={useDefaults} />
       </div>
     </main>
   );
